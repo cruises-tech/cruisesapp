@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>経営理念・指針策定支援クイズ - 株式会社クルージズ・テクノロジーズ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Tailwind gray-100 */
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2.5rem; /* 少しパディングを増やす */
+            background-color: #ffffff;
+            border-radius: 0.75rem; /* 角丸を少し大きく */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* 影を少し濃く */
+        }
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e5e7eb; /* Tailwind gray-200 */
+            border-radius: 0.375rem; /* rounded-md */
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        .progress-bar {
+            height: 12px; /* 少し太く */
+            background-color: #0ea5e9; /* Tailwind sky-500 (クルージズブルーに近い色) */
+            transition: width 0.3s ease-in-out;
+        }
+        textarea {
+            min-height: 120px; /* 少し高さを増やす */
+            border-color: #d1d5db; /* Tailwind gray-300 */
+        }
+        textarea:focus {
+            border-color: #0ea5e9; /* Tailwind sky-500 */
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.3); /* Tailwind sky-500 focus ring */
+        }
+
+        /* 汎用モーダルスタイル */
+        .modal-overlay {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6); /* 背景を少し濃く */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-dialog-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 450px; /* 少し幅を広げる */
+            width: 90%;
+        }
+        
+        /* AIサポートモーダル専用スタイル */
+        #aiSupportModal {
+            z-index: 1010;
+        }
+        #aiSupportModal .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: left;
+            max-width: 550px; /* 少し幅を広げる */
+            width: 90%;
+            max-height: 85vh; /* 高さを少し調整 */
+            overflow-y: auto;
+        }
+        .ai-support-button {
+            background-color: #f97316; /* Tailwind orange-500 (アクセントカラー) */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500; /* 少し太く */
+            transition: background-color 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+        .ai-support-button:hover {
+            background-color: #ea580c; /* Tailwind orange-600 */
+        }
+        .ai-support-button:disabled {
+            background-color: #fdba74; /* Tailwind orange-300 */
+            cursor: not-allowed;
+        }
+        .loader {
+            border: 4px solid #f3f4f6; /* Tailwind gray-100 */
+            border-top: 4px solid #0ea5e9; /* Tailwind sky-500 */
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ボタン共通スタイル */
+        .btn {
+            font-weight: 600; /* semibold */
+            padding: 0.75rem 1.5rem; /* py-3 px-6 */
+            border-radius: 0.5rem; /* rounded-lg */
+            transition: all 0.2s ease-in-out;
+            text-align: center;
+        }
+        .btn-primary {
+            background-color: #0ea5e9; /* Tailwind sky-500 */
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #0284c7; /* Tailwind sky-600 */
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(2, 132, 199, 0.2);
+        }
+        .btn-secondary {
+            background-color: #e5e7eb; /* Tailwind gray-200 */
+            color: #374151; /* Tailwind gray-700 */
+        }
+        .btn-secondary:hover {
+            background-color: #d1d5db; /* Tailwind gray-300 */
+        }
+        .btn-success { /* 送信ボタン用 */
+            background-color: #22c55e; /* Tailwind green-500 */
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #16a34a; /* Tailwind green-600 */
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(22, 163, 74, 0.2);
+        }
+        .btn:disabled {
+            background-color: #9ca3af; /* Tailwind gray-400 */
+            color: #e5e7eb; /* Tailwind gray-200 */
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.875rem; /* text-sm */
+            color: #6b7280; /* Tailwind gray-500 */
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div id="app" class="container mx-auto p-4">
+        </div>
+
+    <div id="aiSupportModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="text-xl font-semibold mb-4 text-sky-600" id="aiSupportModalTitle">AIによるサポート</h3>
+            <div id="aiSupportModalBody" class="text-sm text-gray-700 whitespace-pre-line min-h-[100px]">
+                </div>
+            <div class="mt-6 text-right">
+                <button id="closeAiSupportModalBtn" class="btn btn-secondary">
+                    閉じる
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; <span id="copyrightYear"></span> 株式会社クルージズ・テクノロジーズ</p>
+    </footer>
+
+    <script type="module">
+        // Firebase SDK のインポート
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, collection, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase設定 (グローバル変数から取得)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "YOUR_API_KEY", 
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // Firebaseアプリの初期化
+        const firebaseApp = initializeApp(firebaseConfig);
+        const auth = getAuth(firebaseApp);
+        const db = getFirestore(firebaseApp);
+        setLogLevel('debug'); 
+
+        let currentUserId = null;
+        let isAuthReady = false;
+
+        // 質問データ
+        const questions = [
+            { id: 1, section: "顧客について", text: "1. お客様は誰ですか? どんな悩み・課題を持った人からお金をいただきますか?\nお客様のお悩みや課題、サービスを購入する理由をなるべく具体的に書いてください。" },
+            { id: 2, section: "顧客について", text: "2. 何を提供することまたは、何をすることでお金をいただきますか? お客様はどんなことに価値があると考え、お金を払っていると考えますか?" },
+            { id: 3, section: "顧客について", text: "3. 私たちは何を売っていますか? 何を世の中に提供していますか? 商品名とかではなく、質問1と2を参考に書き出してください。" },
+            { id: 4, section: "提供価値・商品・サービスについて", text: "4-1. どんなレベル、どんな質の商品、サービスを提供しますか?" },
+            { id: 5, section: "提供価値・商品・サービスについて", text: "4-2. また、どんなレベル、どんな質の商品、サービスを提供しませんか?" },
+            { id: 6, section: "提供価値・商品・サービスについて", text: "5. その商品やサービスに対して、こだわるべきこと、こだわりたいことは何ですか?" },
+            { id: 7, section: "顧客との関係性・顧客への提供価値", text: "5. お客様にはどうなってほしいですか? どんな気持ち、どんな状態になってほしいですか? または、したいですか?" },
+            { id: 8, section: "顧客との関係性・顧客への提供価値", text: "6. お客様とどんな関係になりたいですか?" },
+            { id: 9, section: "スタッフ・組織について", text: "7-1. そのためには、スタッフはどんな人物であるべきですか?" },
+            { id: 10, section: "スタッフ・組織について", text: "7-2. そのためには、スタッフはどんな人物であってはならないですか?" },
+            { id: 11, section: "スタッフ・組織について", text: "7-3. そんなスタッフを育成するためには、管理職はどんな人物であるべきですか?" },
+            { id: 12, section: "スタッフ・組織について", text: "7-4. そんなスタッフを育成するためには、管理職はどんな人物であってはならないですか?" },
+            { id: 13, section: "スタッフ・組織について", text: "8. スタッフはどのような行動、考えでその商品やサービスを提供すべきですか?" },
+            { id: 14, section: "スタッフ・組織について", text: "9. 上記のように働いたその先に、スタッフはどのような人物になっていますか?" },
+            { id: 15, section: "会社の評価・将来像", text: "10. そうなると、当社のことをお客様から、取引先からどのように思ってもらえますか?" },
+            { id: 16, section: "会社の評価・将来像", text: "11. お客様に対して、提供したいことを叶え、社員と望むことを叶えた先に、どんな組織にしたいですか?" },
+            { id: 17, section: "会社の評価・将来像", text: "12. 地域から、または世の中からどのように思われる組織にしたいですか?" },
+            { id: 18, section: "現状分析・課題", text: "13. それらが叶えられそうな理由、これまでの実績、強み、こだわりや、資産はなんですか?" },
+            { id: 19, section: "現状分析・課題", text: "14-1. また、それらを叶えるために、今の組織に足りないものはなんですか?" },
+            { id: 20, section: "現状分析・課題", text: "14-2. その足りないものを埋めるために、どんなことが必要だと考えますか?" },
+            { id: 21, section: "働く意義", text: "15. 毎日、なぜ頑張りますか? なぜ、出勤するのですか?" }
+        ];
+
+        // アプリケーションの状態
+        let currentStep = 'intro'; 
+        let currentQuestionIndex = 0;
+        const userAnswers = {}; 
+        const leadInfo = {
+            companyName: '',
+            position: '',
+            phoneNumber: '',
+            name: '',
+            email: '',
+            industry: '',
+            staffCount: ''
+        };
+
+        const appContainer = document.getElementById('app');
+        const aiSupportModalElement = document.getElementById('aiSupportModal');
+        const aiSupportModalBody = document.getElementById('aiSupportModalBody');
+        const closeAiSupportModalBtn = document.getElementById('closeAiSupportModalBtn');
+        const copyrightYearSpan = document.getElementById('copyrightYear');
+
+        // --- Copyright Year ---
+        if(copyrightYearSpan) {
+            copyrightYearSpan.textContent = new Date().getFullYear();
+        }
+
+        // --- Firebase Authentication ---
+        async function initializeAuth() {
+            return new Promise((resolve) => {
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        console.log("User is signed in:", user.uid);
+                        currentUserId = user.uid;
+                    } else {
+                        console.log("User is not signed in. Attempting to sign in...");
+                        try {
+                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                                await signInWithCustomToken(auth, __initial_auth_token);
+                                console.log("Signed in with custom token.");
+                            } else {
+                                await signInAnonymously(auth);
+                                console.log("Signed in anonymously.");
+                            }
+                        } catch (error) {
+                            console.error("Error during sign-in:", error);
+                            currentUserId = `anonymous_${crypto.randomUUID()}`; 
+                        }
+                    }
+                    isAuthReady = true;
+                    resolve(); 
+                });
+            });
+        }
+
+        // --- AI Support Functions ---
+        async function getAiSupport(questionText) {
+            aiSupportModalBody.innerHTML = '<div class="loader"></div> <p class="text-center text-sm text-gray-500">AIがヒントを生成中です...</p>';
+            aiSupportModalElement.classList.add('show');
+
+            const prompt = `あなたは経験豊富な経営コンサルタントです。以下の質問は、経営者が自社の理念や戦略を考えるためのものです。この質問に対して、経営者がどのような視点から考えると良いか、具体的なヒントやアドバイスを3〜5点ほど箇条書きで、簡潔かつ分かりやすく教えてください。各ヒントは1〜2文程度にまとめてください。回答は日本語でお願いします。\n\n質問：${questionText}`;
+            
+            let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+            const payload = { contents: chatHistory };
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error("AI API Error:", errorData);
+                    throw new Error(`AI API request failed with status ${response.status}: ${errorData?.error?.message || response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    aiSupportModalBody.innerHTML = text.replace(/\n/g, '<br>'); // 改行を<br>に変換して表示
+                } else {
+                    console.error("Unexpected AI API response structure:", result);
+                    aiSupportModalBody.textContent = 'AIからのヒントの取得に失敗しました。しばらくしてから再度お試しください。';
+                }
+            } catch (error) {
+                console.error('Error fetching AI support:', error);
+                aiSupportModalBody.textContent = `AIからのヒントの取得中にエラーが発生しました。\n詳細: ${error.message}`;
+            }
+        }
+
+        if (closeAiSupportModalBtn) {
+            closeAiSupportModalBtn.addEventListener('click', () => {
+                aiSupportModalElement.classList.remove('show');
+            });
+        }
+        // --- UI Rendering Functions ---
+        function render() {
+            appContainer.innerHTML = ''; 
+            const quizContainer = document.createElement('div');
+            quizContainer.className = 'quiz-container';
+
+            switch (currentStep) {
+                case 'intro':
+                    quizContainer.appendChild(createIntroPage());
+                    break;
+                case 'quiz':
+                    quizContainer.appendChild(createQuizPage());
+                    break;
+                case 'confirmation':
+                    quizContainer.appendChild(createConfirmationPage());
+                    break;
+                case 'leadForm':
+                    quizContainer.appendChild(createLeadFormPage());
+                    break;
+                case 'thankYou':
+                    quizContainer.appendChild(createThankYouPage());
+                    break;
+                default:
+                    quizContainer.textContent = 'エラーが発生しました。ページを再読み込みしてください。';
+            }
+            appContainer.appendChild(quizContainer);
+        }
+
+        function createIntroPage() {
+            const page = document.createElement('div');
+            // Updated introduction text
+            page.innerHTML = `
+                <h1 class="text-3xl font-bold mb-4 text-center text-sky-600">経営理念・指針策定支援クイズ</h1>
+                <p class="text-center text-gray-500 mb-8 text-sm">Powered by 株式会社クルージズ・テクノロジーズ</p>
+                <p class="mb-5 text-lg text-gray-700">このアプリは、貴社の理念やビジョン、マーケティング方針などを一問一答のクイズ形式で頭の中を整理し、明確化するための一助となることを目的としています。</p>
+                <p class="mb-5 text-gray-700">全${questions.length}問の質問にお答えいただくことで、自社の現状と目指すべき方向性についての考察を深めることができます。</p>
+                <p class="mb-5 text-gray-700">各質問には<strong class="text-orange-500">AIによるサポート機能</strong>があり、回答のヒントを得ることができます。</p>
+                <p class="mb-8 text-gray-700">所要時間は約30分～1時間程度です。じっくりとお考えいただき、ご回答ください。</p>
+                <button id="startQuizBtn" class="w-full btn btn-primary text-lg">
+                    クイズを開始する
+                </button>
+            `;
+            page.querySelector('#startQuizBtn').addEventListener('click', () => {
+                currentStep = 'quiz';
+                render();
+            });
+            return page;
+        }
+
+        function createQuizPage() {
+            const page = document.createElement('div');
+            const question = questions[currentQuestionIndex];
+
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            page.innerHTML = `
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: ${progress}%;"></div>
+                </div>
+                <p class="text-sm text-gray-500 mb-2">質問 ${currentQuestionIndex + 1} / ${questions.length}</p>
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-2xl font-semibold text-sky-700">【${question.section}】</h2>
+                    <button id="aiSupportBtn" class="ai-support-button">AIサポート</button>
+                </div>
+                <p class="text-lg mb-5 text-gray-700 whitespace-pre-line">${question.text}</p>
+                <textarea id="answerText" class="w-full p-3 border border-gray-300 rounded-md focus:ring-sky-500 focus:border-sky-500 text-base" rows="7" placeholder="ご自由にご記入ください"></textarea>
+                <div class="mt-8 flex justify-between">
+                    <button id="prevBtn" class="btn btn-secondary" ${currentQuestionIndex === 0 ? 'disabled' : ''}>
+                        戻る
+                    </button>
+                    <button id="nextBtn" class="btn btn-primary">
+                        ${currentQuestionIndex === questions.length - 1 ? '回答を確認する' : '次へ'}
+                    </button>
+                </div>
+            `;
+
+            const textarea = page.querySelector('#answerText');
+            if (userAnswers[question.id]) {
+                textarea.value = userAnswers[question.id];
+            }
+
+            page.querySelector('#aiSupportBtn').addEventListener('click', (e) => {
+                e.target.disabled = true; 
+                getAiSupport(question.text).finally(() => {
+                    e.target.disabled = false; 
+                });
+            });
+
+            page.querySelector('#prevBtn').addEventListener('click', () => {
+                if (currentQuestionIndex > 0) {
+                    userAnswers[question.id] = textarea.value.trim();
+                    currentQuestionIndex--;
+                    render();
+                }
+            });
+
+            page.querySelector('#nextBtn').addEventListener('click', () => {
+                userAnswers[question.id] = textarea.value.trim();
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    render();
+                } else {
+                    currentStep = 'confirmation';
+                    render();
+                }
+            });
+            return page;
+        }
+
+        function createConfirmationPage() {
+            const page = document.createElement('div');
+            page.innerHTML = `
+                <h1 class="text-2xl font-bold mb-6 text-center text-sky-600">ご回答内容の確認</h1>
+                <p class="mb-6 text-gray-700">以下の内容でよろしければ、「お客様情報を入力する」ボタンを押してください。</p>
+                <div id="answersReview" class="space-y-4 mb-6 max-h-[50vh] overflow-y-auto p-4 border border-gray-200 rounded-md bg-gray-50 shadow-sm">
+                    ${questions.map(q => `
+                        <div class="p-3 border-b border-gray-200 last:border-b-0">
+                            <p class="font-semibold text-sm text-sky-700 whitespace-pre-line">${q.text}</p>
+                            <p class="mt-1.5 text-gray-800 whitespace-pre-line text-sm">${userAnswers[q.id] || '<span class="text-gray-400">(未回答)</span>'}</p>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="mt-8 flex flex-col sm:flex-row justify-between gap-4">
+                    <button id="backToQuizBtn" class="w-full sm:w-auto btn btn-secondary">
+                        修正する (最後の質問に戻る)
+                    </button>
+                    <button id="proceedToLeadFormBtn" class="w-full sm:w-auto btn btn-primary">
+                        お客様情報を入力する
+                    </button>
+                </div>
+            `;
+            page.querySelector('#backToQuizBtn').addEventListener('click', () => {
+                currentStep = 'quiz';
+                render();
+            });
+            page.querySelector('#proceedToLeadFormBtn').addEventListener('click', () => {
+                currentStep = 'leadForm';
+                render();
+            });
+            return page;
+        }
+
+        function createLeadFormPage() {
+            const page = document.createElement('div');
+            page.innerHTML = `
+                <h1 class="text-2xl font-bold mb-6 text-center text-sky-600">お客様情報のご入力</h1>
+                <p class="mb-6 text-sm text-gray-600">ご回答いただいた内容に基づき、より詳細な分析やコンサルティングをご希望の場合は、以下の情報をご入力ください。後日、担当者よりご連絡させていただきます。（* は必須項目です）</p>
+                <form id="leadForm" class="space-y-5">
+                    <div>
+                        <label for="companyName" class="block text-sm font-medium text-gray-700 mb-1">貴社名・貴法人名*</label>
+                        <input type="text" id="companyName" name="companyName" required class="mt-1 block w-full px-3 py-2.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">ご担当者様氏名*</label>
+                        <input type="text" id="name" name="name" required class="mt-1 block w-full px-3 py-2.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="position" class="block text-sm font-medium text-gray-700 mb-1">役職</label>
+                        <input type="text" id="position" name="position" class="mt-1 block w-full px-3 py-2.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="phoneNumber" class="block text-sm font-medium text-gray-700 mb-1">お電話番号*</label>
+                        <input type="tel" id="phoneNumber" name="phoneNumber" required class="mt-1 block w-full px-3 py-2.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm" placeholder="例: 03-1234-5678">
+                    </div>
+                     <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">メールアドレス*</label>
+                        <input type="email" id="email" name="email" required class="mt-1 block w-full px-3 py-2.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm" placeholder="例: contact@example.com">
+                    </div>
+                    <div>
+                        <label for="industry" class="block text-sm font-medium text-gray-700 mb-1">業種</label>
+                        <input type="text" id="industry" name="industry" class="mt-1 block w-full px-3 py-2.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="staffCount" class="block text-sm font-medium text-gray-700 mb-1">スタッフの人数</label>
+                        <select id="staffCount" name="staffCount" class="mt-1 block w-full px-3 py-2.5 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm">
+                            <option value="">選択してください</option>
+                            <option value="1-10">1～10人</option>
+                            <option value="10-20">10～20人</option>
+                            <option value="20-30">20～30人</option>
+                            <option value="30-50">30～50人</option>
+                            <option value="50-80">50～80人</option>
+                            <option value="80-100">80～100人</option>
+                            <option value="100+">100人以上</option>
+                        </select>
+                    </div>
+                    <div class="pt-4">
+                        <button type="submit" class="w-full btn btn-success text-lg">
+                            送信して完了する
+                        </button>
+                    </div>
+                </form>
+                <button id="backToConfirmationBtn" class="w-full mt-4 btn btn-secondary">
+                    回答内容の確認に戻る
+                </button>
+            `;
+
+            page.querySelector('#companyName').value = leadInfo.companyName || '';
+            page.querySelector('#name').value = leadInfo.name || '';
+            page.querySelector('#position').value = leadInfo.position || '';
+            page.querySelector('#phoneNumber').value = leadInfo.phoneNumber || '';
+            page.querySelector('#email').value = leadInfo.email || '';
+            page.querySelector('#industry').value = leadInfo.industry || '';
+            page.querySelector('#staffCount').value = leadInfo.staffCount || '';
+
+
+            page.querySelector('#leadForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const form = event.target;
+                leadInfo.companyName = form.companyName.value.trim();
+                leadInfo.name = form.name.value.trim();
+                leadInfo.position = form.position.value.trim();
+                leadInfo.phoneNumber = form.phoneNumber.value.trim();
+                leadInfo.email = form.email.value.trim();
+                leadInfo.industry = form.industry.value.trim();
+                leadInfo.staffCount = form.staffCount.value;
+
+                if (!leadInfo.companyName || !leadInfo.name || !leadInfo.phoneNumber || !leadInfo.email) {
+                    showGeneralModal("必須項目（貴社名, ご担当者様氏名, お電話番号, メールアドレス）をすべて入力してください。");
+                    return;
+                }
+                
+                if (!isAuthReady || !currentUserId) {
+                    showGeneralModal("認証情報が準備できていません。少し待ってから再試行してください。");
+                    console.error("Authentication not ready or user ID not available.");
+                    return;
+                }
+
+                try {
+                    const submitButton = form.querySelector('button[type="submit"]');
+                    submitButton.disabled = true;
+                    submitButton.textContent = '送信中...';
+
+                    const docId = crypto.randomUUID(); 
+                    const docPath = `artifacts/${appId}/users/${currentUserId}/management_quiz_responses/${docId}`;
+                    
+                    const answersToStore = questions.map(q => ({
+                        questionId: q.id,
+                        questionText: q.text,
+                        answerText: userAnswers[q.id] || ""
+                    }));
+
+                    await setDoc(doc(db, docPath), {
+                        ...leadInfo,
+                        answers: answersToStore,
+                        userId: currentUserId,
+                        timestamp: serverTimestamp(),
+                        appId: appId
+                    });
+                    console.log("Data saved to Firestore:", docPath);
+                    currentStep = 'thankYou';
+                    render();
+                } catch (error) {
+                    console.error("Error saving data to Firestore:", error);
+                    showGeneralModal("データの保存中にエラーが発生しました。お手数ですが、しばらくしてから再度お試しください。");
+                    const submitButton = form.querySelector('button[type="submit"]');
+                    submitButton.disabled = false;
+                    submitButton.textContent = '送信して完了する';
+                }
+            });
+
+            page.querySelector('#backToConfirmationBtn').addEventListener('click', () => {
+                currentStep = 'confirmation';
+                render();
+            });
+            return page;
+        }
+
+        function createThankYouPage() {
+            const page = document.createElement('div');
+            page.innerHTML = `
+                <svg class="mx-auto mb-6 h-16 w-16 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h1 class="text-3xl font-bold mb-6 text-center text-sky-600">ご回答ありがとうございました！</h1>
+                <p class="mb-4 text-lg text-gray-700 text-center">貴重なお時間をいただき、誠にありがとうございます。</p>
+                <p class="mb-4 text-gray-700 text-center">ご入力いただいた内容は、貴社の理念・指針策定の一助となることと存じます。</p>
+                <p class="mb-8 text-gray-700 text-center">お客様情報をご入力いただいた場合、後日担当者よりご連絡させていただくことがございます。</p>
+                <div class="text-center mb-8 p-3 bg-gray-100 rounded-md text-xs">
+                    <p class="mb-1">User ID: <span class="font-mono bg-gray-200 px-1 py-0.5 rounded">${currentUserId || 'N/A'}</span></p>
+                    <p>App ID: <span class="font-mono bg-gray-200 px-1 py-0.5 rounded">${appId}</span></p>
+                </div>
+                <button id="restartQuizBtn" class="w-full btn btn-primary text-lg">
+                    最初からやり直す
+                </button>
+            `;
+             page.querySelector('#restartQuizBtn').addEventListener('click', () => {
+                currentStep = 'intro';
+                currentQuestionIndex = 0;
+                for (const key in userAnswers) delete userAnswers[key];
+                for (const key in leadInfo) leadInfo[key] = '';
+                render();
+            });
+            return page;
+        }
+
+        // --- General Purpose Modal Function ---
+        function showGeneralModal(message, onOk = null) {
+            const existingModal = document.querySelector('.general-modal-overlay');
+            if (existingModal) existingModal.remove();
+
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay general-modal-overlay show'; 
+            modal.innerHTML = `
+                <div class="modal-dialog-content">
+                    <p class="mb-6 text-gray-700">${message}</p>
+                    <div class="modal-buttons">
+                        <button id="generalModalOkBtn" class="btn btn-primary">OK</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            modal.querySelector('#generalModalOkBtn').addEventListener('click', () => {
+                modal.remove();
+                if (onOk) onOk();
+            });
+        }
+
+        // --- Initialization ---
+        async function main() {
+            await initializeAuth(); 
+            render(); 
+        }
+
+        main();
+
+    </script>
+</body>
+</html>
