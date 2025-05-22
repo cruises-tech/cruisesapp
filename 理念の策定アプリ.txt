@@ -14,10 +14,10 @@
         .quiz-container {
             max-width: 800px;
             margin: 2rem auto;
-            padding: 2.5rem; /* 少しパディングを増やす */
+            padding: 2.5rem; 
             background-color: #ffffff;
-            border-radius: 0.75rem; /* 角丸を少し大きく */
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* 影を少し濃く */
+            border-radius: 0.75rem; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); 
         }
         .progress-bar-container {
             width: 100%;
@@ -27,12 +27,12 @@
             margin-bottom: 1.5rem;
         }
         .progress-bar {
-            height: 12px; /* 少し太く */
+            height: 12px; 
             background-color: #0ea5e9; /* Tailwind sky-500 (クルージズブルーに近い色) */
             transition: width 0.3s ease-in-out;
         }
         textarea {
-            min-height: 120px; /* 少し高さを増やす */
+            min-height: 120px; 
             border-color: #d1d5db; /* Tailwind gray-300 */
         }
         textarea:focus {
@@ -47,7 +47,7 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.6); /* 背景を少し濃く */
+            background-color: rgba(0,0,0,0.6); 
             display: flex;
             justify-content: center;
             align-items: center;
@@ -66,7 +66,7 @@
             border-radius: 0.5rem;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             text-align: center;
-            max-width: 450px; /* 少し幅を広げる */
+            max-width: 450px; 
             width: 90%;
         }
         
@@ -80,9 +80,9 @@
             border-radius: 0.5rem;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             text-align: left;
-            max-width: 550px; /* 少し幅を広げる */
+            max-width: 550px; 
             width: 90%;
-            max-height: 85vh; /* 高さを少し調整 */
+            max-height: 85vh; 
             overflow-y: auto;
         }
         .ai-support-button {
@@ -91,7 +91,7 @@
             padding: 0.5rem 1rem;
             border-radius: 0.375rem;
             font-size: 0.875rem;
-            font-weight: 500; /* 少し太く */
+            font-weight: 500; 
             transition: background-color 0.2s;
             cursor: pointer;
             border: none;
@@ -191,19 +191,45 @@
     <script type="module">
         // Firebase SDK のインポート
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, collection, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase設定 (グローバル変数から取得)
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "YOUR_API_KEY", 
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+        // ----------------------------------------------------------------------------------
+        // !! Firebase Authenticationエラー (`auth/configuration-not-found`) が発生する場合 !!
+        // ----------------------------------------------------------------------------------
+        // このエラーは、主にFirebaseコンソール側の設定に起因します。以下の点を確認してください。
+        //
+        // 1. 【Firebaseコンソールでの匿名認証の有効化】
+        //    Firebaseプロジェクト > Authentication > Sign-in method タブで、
+        //    「匿名」プロバイダが「有効」になっていることを確認してください。
+        //
+        // 2. 【Firebaseコンソールでの承認済みドメインの登録】
+        //    同じく Sign-in method タブの「承認済みドメイン」セクションに、
+        //    このアプリをホストしているドメインが追加されていることを確認してください。
+        //    (例: GitHub Pages の場合 `your-username.github.io`)
+        //
+        // 3. 【以下の`firebaseConfig`オブジェクトの正確性】
+        //    `apiKey`, `authDomain`, `projectId` などの値が、Firebaseコンソールから
+        //    コピーした最新かつ正確なものであることを再度確認してください。
+        //    わずかなタイプミスでもエラーの原因となります。
+        //
+        // 4. 【`storageBucket`の値の確認】
+        //    `storageBucket` の値は通常 `your-project-id.appspot.com` という形式です。
+        //    Firebaseコンソールで正しい値を確認し、必要であれば修正してください。
+        // ----------------------------------------------------------------------------------
+        const firebaseConfig = {
+          apiKey: "AIzaSyAFAEAtt9kHK3jdEg3ZrZH1O07PhKYPq8Y",
+          authDomain: "cruisesphilosophyapp.firebaseapp.com",
+          projectId: "cruisesphilosophyapp",
+          storageBucket: "cruisesphilosophyapp.firebasestorage.app", // 通常は projectId.appspot.com 形式です。Firebaseコンソールで正しい値を確認してください。
+          messagingSenderId: "804877582475",
+          appId: "1:804877582475:web:4f602adc8c16c91ba3d48e",
+          measurementId: "G-HNJEMCZTHE" // Google Analytics用 (オプション)
         };
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // This appId is for Firestore path structure (e.g., /artifacts/{appId}/users/...).
+        // It's different from the appId in firebaseConfig above.
+        const appId = 'cruises-philosophy-quiz'; // Firestoreのパス構造で使用するID。任意でOK。
 
         // Firebaseアプリの初期化
         const firebaseApp = initializeApp(firebaseConfig);
@@ -271,23 +297,34 @@
                     if (user) {
                         console.log("User is signed in:", user.uid);
                         currentUserId = user.uid;
+                        isAuthReady = true; 
+                        resolve();
                     } else {
-                        console.log("User is not signed in. Attempting to sign in...");
+                        console.log("User is not signed in. Attempting to sign in anonymously...");
                         try {
-                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                                await signInWithCustomToken(auth, __initial_auth_token);
-                                console.log("Signed in with custom token.");
-                            } else {
-                                await signInAnonymously(auth);
-                                console.log("Signed in anonymously.");
-                            }
+                            await signInAnonymously(auth);
+                            console.log("Anonymous sign-in attempt successful. Waiting for onAuthStateChanged to confirm user state...");
+                            // signInAnonymouslyが成功した場合、onAuthStateChangedが再度呼び出され、
+                            // その際に user オブジェクトが存在するため、上記の if (user) ブロックで処理されます。
+                            // そのため、ここでは isAuthReady や resolve は呼び出しません。
                         } catch (error) {
-                            console.error("Error during sign-in:", error);
-                            currentUserId = `anonymous_${crypto.randomUUID()}`; 
+                            console.error("--------------------------------------------------------------------");
+                            console.error("Firebase匿名認証エラー (auth/configuration-not-found):");
+                            console.error("--------------------------------------------------------------------");
+                            console.error("このエラーは、通常Firebaseコンソール側の設定が原因です。以下を確認してください：");
+                            console.error("1. 【匿名認証の有効化】Firebaseコンソール > Authentication > 「Sign-in method」タブで、「匿名」プロバイダが「有効」になっているか。");
+                            console.error("2. 【承認済みドメイン】同じく「Sign-in method」タブの「承認済みドメイン」に、このアプリをホストしているドメイン (例: your-username.github.io) が追加されているか。");
+                            console.error("3. 【Firebase設定オブジェクト】このHTMLファイル内の`firebaseConfig`オブジェクトの値 (apiKey, authDomain, projectId等) が、Firebaseコンソールからコピーした最新かつ正確なものか。");
+                            console.error("4. 【Storage Bucket形式】`firebaseConfig`内の`storageBucket`の値は、通常 `your-project-id.appspot.com` の形式です。現在の値 (`" + firebaseConfig.storageBucket + "`) が正しいかFirebaseコンソールで確認してください。");
+                            console.error("--------------------------------------------------------------------");
+                            console.error("発生したエラーの詳細:", error);
+                            console.error("--------------------------------------------------------------------");
+                            
+                            currentUserId = `anonymous_fallback_${crypto.randomUUID()}`; 
+                            isAuthReady = true; 
+                            resolve(); 
                         }
                     }
-                    isAuthReady = true;
-                    resolve(); 
                 });
             });
         }
@@ -301,8 +338,8 @@
             
             let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
             const payload = { contents: chatHistory };
-            const apiKey = ""; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            const geminiApiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`;
 
             try {
                 const response = await fetch(apiUrl, {
@@ -323,7 +360,7 @@
                     result.candidates[0].content && result.candidates[0].content.parts &&
                     result.candidates[0].content.parts.length > 0) {
                     const text = result.candidates[0].content.parts[0].text;
-                    aiSupportModalBody.innerHTML = text.replace(/\n/g, '<br>'); // 改行を<br>に変換して表示
+                    aiSupportModalBody.innerHTML = text.replace(/\n/g, '<br>');
                 } else {
                     console.error("Unexpected AI API response structure:", result);
                     aiSupportModalBody.textContent = 'AIからのヒントの取得に失敗しました。しばらくしてから再度お試しください。';
@@ -369,7 +406,6 @@
 
         function createIntroPage() {
             const page = document.createElement('div');
-            // Updated introduction text
             page.innerHTML = `
                 <h1 class="text-3xl font-bold mb-4 text-center text-sky-600">経営理念・指針策定支援クイズ</h1>
                 <p class="text-center text-gray-500 mb-8 text-sm">Powered by 株式会社クルージズ・テクノロジーズ</p>
@@ -559,9 +595,9 @@
                     return;
                 }
                 
-                if (!isAuthReady || !currentUserId) {
+                if (!isAuthReady || !currentUserId) { 
                     showGeneralModal("認証情報が準備できていません。少し待ってから再試行してください。");
-                    console.error("Authentication not ready or user ID not available.");
+                    console.error("Authentication not ready or user ID not available for Firestore operation.");
                     return;
                 }
 
@@ -584,7 +620,7 @@
                         answers: answersToStore,
                         userId: currentUserId,
                         timestamp: serverTimestamp(),
-                        appId: appId
+                        appId: appId 
                     });
                     console.log("Data saved to Firestore:", docPath);
                     currentStep = 'thankYou';
@@ -617,7 +653,7 @@
                 <p class="mb-8 text-gray-700 text-center">お客様情報をご入力いただいた場合、後日担当者よりご連絡させていただくことがございます。</p>
                 <div class="text-center mb-8 p-3 bg-gray-100 rounded-md text-xs">
                     <p class="mb-1">User ID: <span class="font-mono bg-gray-200 px-1 py-0.5 rounded">${currentUserId || 'N/A'}</span></p>
-                    <p>App ID: <span class="font-mono bg-gray-200 px-1 py-0.5 rounded">${appId}</span></p>
+                    <p>App ID (Firestore Path): <span class="font-mono bg-gray-200 px-1 py-0.5 rounded">${appId}</span></p>
                 </div>
                 <button id="restartQuizBtn" class="w-full btn btn-primary text-lg">
                     最初からやり直す
